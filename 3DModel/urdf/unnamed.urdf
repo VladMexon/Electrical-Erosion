@@ -2,7 +2,7 @@
   <joint name="joint1" type="revolute">
     <limit lower="-3.14159" upper="3.14159" effort="0.00000" velocity="0.00000"/>
     <origin rpy="-0.00000 -0.00000 0.00000" xyz="0.81280 -0.00000 1.00512"/>
-    <parent link="Cylinder_link"/>
+    <parent link="base_link"/>
     <child link="Cylinder.011_link"/>
     <axis xyz="0.00000 0.00000 1.00000"/>
   </joint>
@@ -42,8 +42,8 @@
     <axis xyz="0.00000 0.00000 1.00000"/>
   </joint>
   <joint name="joint7" type="prismatic">
-    <limit lower="1.00000" upper="0.00000" effort="0.00000" velocity="0.00000"/>
-    <origin rpy="-1.57080 0.00000 3.14159" xyz="1.03191 -2.31173 0.00000"/>
+    <limit lower="0.00000" upper="1.00000" effort="0.00000" velocity="0.00000"/>
+    <origin rpy="-1.57080 0.00000 3.14159" xyz="1.03191 -2.90919 0.00000"/>
     <parent link="Cylinder.009_link"/>
     <child link="Cylinder.001_link"/>
     <axis xyz="0.00000 0.00000 1.00000"/>
@@ -55,5 +55,5 @@
   <link name="Cylinder.005_link"/>
   <link name="Cylinder.009_link"/>
   <link name="Cylinder.011_link"/>
-  <link name="Cylinder_link"/>
+  <link name="base_link"/>
 </robot>
