@@ -11,7 +11,7 @@ module joint2(){
 }
 module joint3(){
     rotate([-90,0,0])
-    translate([0, 0, -3.78626])
+    translate([-0.120411, 0, -3.78626])
            import("3DModel/STL/manipulator-phobosCylinder_004.stl");
 }
 module joint4(){
