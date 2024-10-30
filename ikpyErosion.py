@@ -1,6 +1,7 @@
 import ikpy.chain
 import numpy as np
 import math
+import time
 
 def compute_joint_positions_and_orientations(urdf_file, target_position):
     my_chain = ikpy.chain.Chain.from_urdf_file(urdf_file)
@@ -21,7 +22,7 @@ def compute_joint_positions_and_orientations(urdf_file, target_position):
         joint_positions.append(position)
         joint_orientations.append(orientation_euler)
         
-        print(f"Joint {i}: Position = {position}, Orientation (Euler angles) = {orientation_euler}")
+        #print(f"Joint {i}: Position = {position}, Orientation (Euler angles) = {orientation_euler}")
     
     return joint_positions, joint_orientations
 
@@ -43,5 +44,18 @@ def rotation_matrix_to_euler_angles(R):
     return np.array([x, y, z])
 
 urdf_file = "3DModel/urdf/unnamed.urdf"
-target_position = [2, -1, 2]
-compute_joint_positions_and_orientations(urdf_file, target_position)
+target_positions = [[2, 2, 2], [2, 2, 3], [2, 2, 4], [2, 3, 4], [3, 3, 3], [0, 0, 5]]
+for target_position in target_positions:
+    joint_positions, joint_orientations = compute_joint_positions_and_orientations(urdf_file, target_position)
+
+
+    config = ""
+    for i in range(len(joint_positions)):
+        config += f"pos{i} = [{joint_positions[i][0]}, {joint_positions[i][1]}, {joint_positions[i][2]}];"
+    for i in range(len(joint_orientations)):
+        config += f"rot{i} = [{joint_orientations[i][0]}, {joint_orientations[i][1]}, {joint_orientations[i][2]}];"
+
+    f = open("config.scad", "w")
+    f.write(config);
+    f.close();
+    time.sleep(2)
