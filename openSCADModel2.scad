@@ -1,5 +1,5 @@
 include <config.scad>
-import("C:/STL2/manipulator-phobosCylinder.stl");
+import("3DModel/STL/manipulator-phobosCylinder.stl");
 module joint1(){
     translate([-0.812797, 0, -1.00512 ])
            import("3DModel/STL/manipulator-phobosCylinder_011.stl");
