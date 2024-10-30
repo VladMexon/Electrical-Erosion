@@ -2,42 +2,41 @@ include <config.scad>
 import("C:/STL2/manipulator-phobosCylinder.stl");
 module joint1(){
     translate([-0.812797, 0, -1.00512 ])
-           import("C:/STL2/manipulator-phobosCylinder_011.stl");
+           import("3DModel/STL/manipulator-phobosCylinder_011.stl");
 }
 module joint2(){
     rotate([-90,0,0])
     translate([-0.87, 0, -2.58848])
-           import("C:/STL2/manipulator-phobosCylinder_003.stl");
+           import("3DModel/STL/manipulator-phobosCylinder_003.stl");
 }
 module joint3(){
     rotate([-90,0,0])
     translate([0, 0, -3.78626])
-           import("C:/STL2/manipulator-phobosCylinder_004.stl");
+           import("3DModel/STL/manipulator-phobosCylinder_004.stl");
 }
 module joint4(){
     rotate([-90,0,0])
     translate([-0.61, 0, -4.82])
-           import("C:/STL2/manipulator-phobosCylinder_005.stl");
+           import("3DModel/STL/manipulator-phobosCylinder_005.stl");
 }
 module joint5(){
     rotate([0,-90,0])
     translate([-1.69858, 0, -4.89217])
-           import("C:/STL2/manipulator-phobosCylinder_002.stl");
+           import("3DModel/STL/manipulator-phobosCylinder_002.stl");
 }
 module joint6(){
     rotate([-90,0,0])
     translate([-2.87982, 0, -4.87925])
-           import("C:/STL2/manipulator-phobosCylinder_009.stl");
+           import("3DModel/STL/manipulator-phobosCylinder_009.stl");
 }
 module joint7(){
     rotate([0,-180,0])
     translate([-3.91173, 0, -1.97])
-           import("C:/STL2/manipulator-phobosCylinder_001.stl");
+           import("3DModel/STL/manipulator-phobosCylinder_001.stl");
 }
 module myrotate(a, orig) {
   translate(orig)
   rotate(a)
-    
   children();
 }
 myrotate(rot1, pos1) {
