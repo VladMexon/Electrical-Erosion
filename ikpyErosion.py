@@ -1,6 +1,7 @@
 import ikpy.chain
 import numpy as np
 import math
+import os
 
 def compute_joint_positions_and_orientations(urdf_file, target_position):
     my_chain = ikpy.chain.Chain.from_urdf_file(urdf_file)
@@ -51,7 +52,6 @@ def emulate_movement(direction, step, count, list):
         elif(direction == 'z'):
             position[3] += step
         list.append(position)
-    return list
 
 def generate_config(target_positions):
     joint_positions, joint_orientations = compute_joint_positions_and_orientations(urdf_file, target_positions[len(target_positions) - 1])
@@ -70,10 +70,36 @@ def generate_config(target_positions):
     f.write(config);
     f.close();
 
+def generate_images():
+    global lastImageNum
+    os.system(f"\"c:\Program Files\OpenSCAD\openscad.exe\" -o imgs/output{lastImageNum}.png openSCADModel2.scad");
+    lastImageNum += 1
+lastImageNum = 1
 urdf_file = "3DModel/urdf/unnamed.urdf"
-target_positions = [[3.1,-0.2,3.3]] #start point
-emulate_movement('y', 0.04, 10, target_positions)
-emulate_movement('x', 0.04, 5, target_positions)
-emulate_movement('y', -0.04, 10, target_positions)
-emulate_movement('x', -0.04, 4, target_positions)
+target_positions = [[3.1,-0.2,3.31]] #start point
+emulate_movement('y', 0.02, 20, target_positions)
 generate_config(target_positions)
+generate_images()
+emulate_movement('x', 0.02, 10, target_positions)
+generate_config(target_positions)
+generate_images()
+emulate_movement('y', -0.02, 20, target_positions)
+generate_config(target_positions)
+generate_images()
+emulate_movement('x', -0.02, 9, target_positions)
+generate_config(target_positions)
+generate_images()
+emulate_movement('y', 0.02, 1, target_positions)
+emulate_movement('x', 0.02, 1, target_positions)
+emulate_movement('y', 0.02, 18, target_positions)
+generate_config(target_positions)
+generate_images()
+emulate_movement('x', 0.02, 6, target_positions)
+generate_config(target_positions)
+generate_images()
+emulate_movement('y', -0.02, 17, target_positions)
+generate_config(target_positions)
+generate_images()
+emulate_movement('x', -0.02, 7, target_positions)
+generate_config(target_positions)
+generate_images()

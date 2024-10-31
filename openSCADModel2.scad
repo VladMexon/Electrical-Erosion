@@ -64,7 +64,7 @@ $vpt = [3, 0, 3];
 // Set camera orientation (roll, pitch, yaw)
 $vpr = [45, 0, 45];
 // Set camera distance
-$vpd = 5;
+$vpd = 10;
 translate([-5,-5,0]) cube([15,10,1]);//platform
 translate([2,-1,1]) cube([2,2,2]);//table
 difference(){
