@@ -1,7 +1,6 @@
 import ikpy.chain
 import numpy as np
 import math
-import time
 
 def compute_joint_positions_and_orientations(urdf_file, target_position):
     my_chain = ikpy.chain.Chain.from_urdf_file(urdf_file)
@@ -16,7 +15,6 @@ def compute_joint_positions_and_orientations(urdf_file, target_position):
         position = transformation_matrix[:3, 3]
         orientation_matrix = transformation_matrix[:3, :3]
         
-        # Конвертируем матрицу вращения в углы Эйлера
         orientation_euler = rotation_matrix_to_euler_angles(orientation_matrix)
         
         joint_positions.append(position)
@@ -43,19 +41,39 @@ def rotation_matrix_to_euler_angles(R):
     x, y, z = np.array([x, y, z]) * 180.0 / math.pi
     return np.array([x, y, z])
 
-urdf_file = "3DModel/urdf/unnamed.urdf"
-target_positions = [[2, 2, 2], [2, 2, 3], [2, 2, 4], [2, 3, 4], [3, 3, 3], [0, 0, 5]]
-for target_position in target_positions:
-    joint_positions, joint_orientations = compute_joint_positions_and_orientations(urdf_file, target_position)
+def emulate_movement(direction, step, count, list):
+    for i in range(count):
+        position = list[len(list) - 1].copy()
+        if(direction == 'x'):
+            position[0] += step
+        elif(direction == 'y'):
+            position[1] += step
+        elif(direction == 'z'):
+            position[3] += step
+        list.append(position)
+    return list
 
-
+def generate_config(target_positions):
+    joint_positions, joint_orientations = compute_joint_positions_and_orientations(urdf_file, target_positions[len(target_positions) - 1])
     config = ""
     for i in range(len(joint_positions)):
         config += f"pos{i} = [{joint_positions[i][0]}, {joint_positions[i][1]}, {joint_positions[i][2]}];"
     for i in range(len(joint_orientations)):
         config += f"rot{i} = [{joint_orientations[i][0]}, {joint_orientations[i][1]}, {joint_orientations[i][2]}];"
-
+    config += "cuts = ["
+    for i in range(len(target_positions)):
+        config += f"[{target_positions[i][0]}, {target_positions[i][1]}, {target_positions[i][2]}]"
+        if i < len(target_positions) - 1:
+            config += ","
+    config += "];"
     f = open("config.scad", "w")
     f.write(config);
     f.close();
-    time.sleep(2)
+
+urdf_file = "3DModel/urdf/unnamed.urdf"
+target_positions = [[3.1,-0.2,3.3]] #start point
+emulate_movement('y', 0.04, 10, target_positions)
+emulate_movement('x', 0.04, 5, target_positions)
+emulate_movement('y', -0.04, 10, target_positions)
+emulate_movement('x', -0.04, 4, target_positions)
+generate_config(target_positions)

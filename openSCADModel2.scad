@@ -1,5 +1,4 @@
 include <config.scad>
-import("3DModel/STL/manipulator-phobosCylinder.stl");
 module joint1(){
     translate([-0.812797, 0, -1.00512 ])
            import("3DModel/STL/manipulator-phobosCylinder_011.stl");
@@ -59,4 +58,17 @@ myrotate(rot6, pos6) {
 }
 myrotate(rot7, pos7) {
   joint7();
+}
+// Set camera position (x, y, z)
+$vpt = [3, 0, 3];
+// Set camera orientation (roll, pitch, yaw)
+$vpr = [45, 0, 45];
+// Set camera distance
+$vpd = 5;
+translate([-5,-5,0]) cube([15,10,1]);//platform
+translate([2,-1,1]) cube([2,2,2]);//table
+difference(){
+    translate([3,-0.5,3]) cube([0.5,1,0.3]);
+    for(i = cuts)
+    translate(i) sphere(0.03, $fn=20);
 }
