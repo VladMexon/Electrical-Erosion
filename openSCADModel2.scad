@@ -71,14 +71,14 @@ $vpt = [3, 0, 3];
 // Set camera orientation (roll, pitch, yaw)
 $vpr = [45, 0, 45];
 // Set camera distance
-$vpd = 13;
+$vpd = 4;
 color("goldenrod")
 translate([-5,-5,0]) cube([15,10,1]);//platform
 color("firebrick")
 translate([2,-1,1]) cube([2,2,2]);//table
 difference(){
     color("gray")
-    translate([3,-0.5,3]) cube([0.5,1,0.3]);
+    translate([3,-0.5,3]) cube([0.2,1,0.15]);
     for(i = cuts)
-    translate(i) sphere(0.03, $fn=20);
+    translate(i) sphere(0.02, $fn=20);
 }

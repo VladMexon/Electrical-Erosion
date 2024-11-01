@@ -50,10 +50,11 @@ def emulate_movement(direction, step, count, list):
         elif(direction == 'y'):
             position[1] += step
         elif(direction == 'z'):
-            position[3] += step
+            position[2] += step
         list.append(position)
+    
 
-def generate_config(target_positions):
+def generate_config(target_positions, imgs = False):
     joint_positions, joint_orientations = compute_joint_positions_and_orientations(urdf_file, target_positions[len(target_positions) - 1])
     config = ""
     for i in range(len(joint_positions)):
@@ -69,37 +70,42 @@ def generate_config(target_positions):
     f = open("config.scad", "w")
     f.write(config);
     f.close();
+    if(imgs):
+        generate_images()
 
 def generate_images():
     global lastImageNum
     os.system(f"\"c:\Program Files\OpenSCAD\openscad.exe\" -o imgs/output{lastImageNum}.png openSCADModel2.scad");
     lastImageNum += 1
+
+
 lastImageNum = 1
 urdf_file = "3DModel/urdf/unnamed.urdf"
-target_positions = [[3.1,-0.2,3.31]] #start point
-emulate_movement('y', 0.02, 20, target_positions)
-generate_config(target_positions)
-generate_images()
-emulate_movement('x', 0.02, 10, target_positions)
-generate_config(target_positions)
-generate_images()
-emulate_movement('y', -0.02, 20, target_positions)
-generate_config(target_positions)
-generate_images()
-emulate_movement('x', -0.02, 9, target_positions)
-generate_config(target_positions)
-generate_images()
-emulate_movement('y', 0.02, 1, target_positions)
-emulate_movement('x', 0.02, 1, target_positions)
-emulate_movement('y', 0.02, 18, target_positions)
-generate_config(target_positions)
-generate_images()
-emulate_movement('x', 0.02, 6, target_positions)
-generate_config(target_positions)
-generate_images()
-emulate_movement('y', -0.02, 17, target_positions)
-generate_config(target_positions)
-generate_images()
-emulate_movement('x', -0.02, 7, target_positions)
-generate_config(target_positions)
-generate_images()
+
+step = 0.02
+stepZ= 0.05
+target_positions = [[3.05,-0.4,3.2]] #start point
+for i in range(math.floor(0.1/step)):
+    generate_config(target_positions, True)
+    emulate_movement('z', -stepZ, 1, target_positions)
+    generate_config(target_positions, True)
+    emulate_movement('z', stepZ, 1, target_positions)
+    generate_config(target_positions, True)
+    emulate_movement('y', step, 1, target_positions)
+target_positions = [[3.05,-0.4,3.15]] #start point
+for i in range(3):
+    emulate_movement('y', step, math.floor(0.8/step) - i * 2, target_positions)
+    emulate_movement('x', step, math.floor(0.1/step) - i * 2, target_positions)
+    emulate_movement('y', -step, math.floor(0.8/step) - i * 2, target_positions)
+    emulate_movement('x', -step, math.floor(0.1/step) - i * 2, target_positions)
+    emulate_movement('x', step, 1, target_positions)
+    emulate_movement('y', step, 1, target_positions)
+    generate_config(target_positions, True)
+        
+
+
+
+   
+    
+    
+    
