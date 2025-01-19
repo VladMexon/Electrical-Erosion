@@ -30,10 +30,10 @@ class EDMSimulation:
         # Инициализация сеток
         self.workpiece_grid = np.ones(grid_size)
         self.temperature_grid = np.ones(grid_size) * 300  # Начальная температура 300K
-        self.tool_position = np.array([grid_size[0]//2, grid_size[1]//2, grid_size[2]])
+        self.tool_position = np.array([grid_size[0]//2, grid_size[1]//2, grid_size[2] + 2])
         
         # Размер ячейки сетки (в метрах)
-        self.cell_size = 0.0001 
+        self.cell_size = 0.0001
     
     def calculate_plasma_channel_radius(self):
         """Расчет радиуса плазменного канала"""
@@ -73,17 +73,14 @@ class EDMSimulation:
         
         return discharge_point
 
-    def calculate_cooling(self, dt):
-        """
-        Расчет охлаждения материала на основе уравнения теплопроводности
-        
-        Parameters:
-        -----------
-        dt : float
-            Шаг по времени [с]
-        """
+    def calculate_temp_distribution(self, dt):
         # Коэффициент температуропроводности материала
         alpha = self.workpiece.thermal_conductivity / (self.workpiece.density * self.workpiece.specific_heat)
+
+        #условие Куранта-Фридрихса-Леви
+        #print(f'dt: {dt} (dx²)/(2α):{self.cell_size**2/(2*alpha)}')
+        if(dt > self.cell_size**2/(2*alpha)):
+            print("AAAAAAAA! Слишком большой шаг по времени отностиельно размера ячейки!")
         
         # Создаем копию текущего распределения температуры
         temp_old = self.temperature_grid.copy()
@@ -101,16 +98,7 @@ class EDMSimulation:
                         # Изменение температуры
                         dT = alpha * (d2T_dx2 + d2T_dy2 + d2T_dz2) * dt
                         
-                        # Учет теплообмена с окружающей средой
-                        h = 50  # коэффициент теплоотдачи [Вт/(м²·К)]
-                        surface_area = 6 * self.cell_size**2  # площадь поверхности ячейки
-                        volume = self.cell_size**3  # объем ячейки
-                        
-                        # Теплообмен с окружающей средой (закон Ньютона-Рихмана)
-                        T_ambient = 300  # температура окружающей среды [К]
-                        dT_conv = h * surface_area * (T_ambient - temp_old[i,j,k]) * dt / (self.workpiece.density * self.workpiece.specific_heat * volume)
-                        
-                        self.temperature_grid[i,j,k] = temp_old[i,j,k] + dT + dT_conv
+                        self.temperature_grid[i,j,k] = temp_old[i,j,k] + dT
 
     def update_temperature(self, discharge_point):
         """Обновление температуры после разряда с учетом теплопроводности между ячейками"""
@@ -120,23 +108,32 @@ class EDMSimulation:
         
         # Расчет теплового потока от разряда
         heat_input = self.calculate_heat_input(distances)
+        
         dt = self.params.pulse_on_time * 1e-6
         
-        # Расчет изменения температуры от разряда
-        dT_discharge = (heat_input * dt) / (self.workpiece.density * self.workpiece.specific_heat)
+        # Расчет изменения температуры с учетом размера ячейки
+        cell_surface_area = self.cell_size * self.cell_size  # площадь грани ячейки [м²]
+        cell_volume = self.cell_size ** 3  # объем ячейки [м³]
+        
+        # Энергия, полученная ячейкой [Дж] = [Вт/м²] * [м²] * [с]
+        energy_received = heat_input * cell_surface_area * dt
+        
+        # Изменение температуры [К] = [Дж] / ([кг/м³] * [м³] * [Дж/(кг*К)])
+        dT = energy_received / (self.workpiece.density * cell_volume * self.workpiece.specific_heat)
+        
         
         # Применяем изменение температуры от разряда только там, где есть материал
         mask = self.workpiece_grid > 0
-        self.temperature_grid[mask] += dT_discharge[mask]
+        self.temperature_grid[mask] += dT[mask]
 
         # Удаление материала при достижении температуры испарения
         vaporized = self.temperature_grid > self.workpiece.vaporization_point
         self.workpiece_grid[vaporized] = 0
         self.temperature_grid[self.workpiece_grid == 0] = 300
         
-        # Охлаждение во время паузы
-        dt_cooling = self.params.pulse_off_time * 1e-6
-        self.calculate_cooling(dt_cooling)
+        # Распределение температуры
+        dt_off = self.params.pulse_off_time * 1e-6
+        self.calculate_temp_distribution(dt_off)
         
     
     def simulate_single_discharge(self):
@@ -371,19 +368,20 @@ if __name__ == "__main__":
     steel = Material(
         name="Сталь",
         density=7850,
-        thermal_conductivity=30, #50.2
+        thermal_conductivity=50.2, #50.2
         specific_heat=486,
         vaporization_point=3273,  # Температура испарения стали
         latent_heat_vaporization=6095e3
     )
     
     params = MachineParameters(
-        voltage=300,            # Напряжение [В] 25
-        current=12,         # Ток [А] 2.34
-        pulse_on_time=600,      # Длительность импульса [мкс] 5
-        pulse_off_time=20,     # Длительность паузы [мкс] 4
-        energy_efficiency=0.50 # КПД процесса 0.25
+        voltage=70,            # Напряжение [В] 25
+        current= 5,         # Ток [А] 2.34
+        pulse_on_time=50,      # Длительность импульса [мкс] 5
+        pulse_off_time=18,     # Длительность паузы [мкс] 4
+        energy_efficiency=1 # КПД процесса 0.25
     )
+    
     sim = EDMSimulation(
         workpiece_material=steel,
         tool_material=copper,
@@ -396,7 +394,7 @@ if __name__ == "__main__":
     #print("Начальное состояние:")
     #sim.visualize()
     
-    #sim.run_simulation(num_discharges=50000, visualize_every=50000)
+    #sim.run_simulation(num_discharges=500, visualize_every=100)
     
     #print("\nКонечное состояние:")
     #sim.visualize()
@@ -405,12 +403,12 @@ if __name__ == "__main__":
     
     
     #ПО ВРЕМЕНИ
-    sim.simulate_time_period(time_period=30 , show_progress=True)
+    sim.simulate_time_period(time_period=0.1 , show_progress=True)
     
     #Расчет показателей производительности
     sim.calculate_performance_metrics()
 
-    #print("\nКонечное состояние:")
+    print("\nКонечное состояние:")
     sim.visualize()
 
 
