@@ -1,0 +1,14 @@
+https://www.sciencedirect.com/science/article/pii/S2214157X24003344 - Thermal model of crater formation process in electrical discharge machining
+https://www.sciencedirect.com/science/article/pii/S2666827021000499 - Machine learning and statistical approach in modeling and optimization of surface roughness in wire electrical discharge machining
+https://www.sciencedirect.com/science/article/pii/S2351978918307145 - Numerical modeling of electrical discharge machining of Ti-6Al-4V
+https://www.mdpi.com/2075-4701/14/1/14 - Progress in Simulation Modeling Based on the Finite Element Method for Electrical Discharge Machining 
+https://www.sciencedirect.com/science/article/pii/S2212827112001448 - Modeling and simulation of electrical discharge machining (interesting)
+https://link.springer.com/book/10.1007/978-981-16-5371-1 - (c243)Modeling and Simulation of Electrical Discharge Machining—A Review (interesting)
+https://cyberleninka.ru/article/n/modelirovanie-elektroerozionnogo-proshivaniya-mikrootverstiy - Моделирование электроэрозионного прошивания микроотверстий (interesting)
+https://cyberleninka.ru/article/n/model-protsessa-elektroerozionnoy-obrabotki - МОДЕЛЬ ПРОЦЕССА ЭЛЕКТРОЭРОЗИОННОЙ ОБРАБОТКИ (2008 год)
+https://cyberleninka.ru/article/n/issledovanie-protsessov-elektroerozionnoy-obrabotki - Исследование процессов электроэрозионной обработки
+https://elibrary.ru/item.asp?id=35613219 - ФИЗИЧЕСКАЯ МОДЕЛЬ ПРОЦЕССА ОБЪЁМНОЙ ЭЛЕКТРОЭРОЗИОННОЙ ОБРАБОТКИ ()
+https://www.elibrary.ru/item.asp?id=27259018 - ИССЛЕДОВАНИЕ ПРОЦЕССОВ ЭЛЕКТРОЭРОЗИОННОЙ ОБРАБОТКИ
+https://www.elibrary.ru/item.asp?id=47485900 - МОДЕЛИРОВАНИЕ ПРОЦЕССА ЭЛЕКТРОЭРОЗИОННОЙ ОБРАБОТКИ С ИСПОЛЬЗОВАНИЕМ НЕЙРОННЫХ СЕТЕЙ (в открытом доступе нет)
+https://www.elibrary.ru/item.asp?id=35657968 - МОДЕЛИРОВАНИЕ ФОРМИРОВАНИЯ ЭРОЗИОННЫХ ЛУНОК ПРИ ЭЛЕКТРОЭРОЗИОННОЙ МИКРООБРАБОТКЕ
+https://www.elibrary.ru/item.asp?id=47204657 - МОДЕЛИРОВАНИЕ ЕДИНИЧНОГО РАЗРЯДА ЭРОЗИОННОГО ПРОЦЕССА В КОМБИНИРОВАННОЙ ОБРАБОТКЕ ТВЕРДОГО СПЛАВА
