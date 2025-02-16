@@ -1,19 +1,35 @@
-https://www.sciencedirect.com/science/article/pii/S2214157X24003344 - Thermal model of crater formation process in electrical discharge machining ***
-https://www.sciencedirect.com/science/article/pii/S2666827021000499 - Machine learning and statistical approach in modeling and optimization of surface roughness in wire electrical discharge machining ***
-https://www.sciencedirect.com/science/article/pii/S2351978918307145 - Numerical modeling of electrical discharge machining of Ti-6Al-4V
-https://www.mdpi.com/2075-4701/14/1/14 - Progress in Simulation Modeling Based on the Finite Element Method for Electrical Discharge Machining ***
+Стоит обратить внимание на:
 https://www.sciencedirect.com/science/article/pii/S2212827112001448 - Modeling and simulation of electrical discharge machining (interesting)
-https://link.springer.com/book/10.1007/978-981-16-5371-1 - (c243)Modeling and Simulation of Electrical Discharge Machining—A Review (interesting)
-https://cyberleninka.ru/article/n/modelirovanie-elektroerozionnogo-proshivaniya-mikrootverstiy - Моделирование электроэрозионного прошивания микроотверстий (interesting) ***
+https://link.springer.com/book/10.1007/978-981-16-5371-1 - (c243)Modeling and Simulation of Electrical Discharge Machining—A Review (interesting) [242]
+https://www.sciencedirect.com/science/article/pii/S2351978918307145 - Numerical modeling of electrical discharge machining of Ti-6Al-4V
+https://www.elibrary.ru/item.asp?id=35657968 - МОДЕЛИРОВАНИЕ ФОРМИРОВАНИЯ ЭРОЗИОННЫХ ЛУНОК ПРИ ЭЛЕКТРОЭРОЗИОННОЙ МИКРООБРАБОТКЕ
+https://www.sciencedirect.com/science/article/pii/S2214157X24000029 - Thermal simulation of microelectrode machining process during block electrical discharge grinding
+https://www.elibrary.ru/item.asp?id=47204657 - МОДЕЛИРОВАНИЕ ЕДИНИЧНОГО РАЗРЯДА ЭРОЗИОННОГО ПРОЦЕССА В КОМБИНИРОВАННОЙ ОБРАБОТКЕ ТВЕРДОГО СПЛАВА
+https://www.elibrary.ru/item.asp?id=47485900 - МОДЕЛИРОВАНИЕ ПРОЦЕССА ЭЛЕКТРОЭРОЗИОННОЙ ОБРАБОТКИ С ИСПОЛЬЗОВАНИЕМ НЕЙРОННЫХ СЕТЕЙ (в открытом доступе нет)
+https://link.springer.com/article/10.1007/s00170-023-11603-x - Experimental modeling techniques in electrical discharge machining (EDM): A review
+https://link.springer.com/chapter/10.1007/978-981-19-0676-3_20 - Process Simulation of Electrical Discharge Machining: A Review [237]
+https://link.springer.com/article/10.1007/s00170-024-13999-6 - Thermal-fluid coupling model of crater formation in electrical discharge machining
+https://ieeexplore.ieee.org/document/4797377 - Simulation and Analysis of Electrical Discharge Machine Based on Virtual Prototype
+https://ieeexplore.ieee.org/document/10586027 - Numerical Modelling and Simulation of Micro Electro-Discharge Machining: Prediction of Crater Size
+https://digitalcommons.unl.edu/mechengdiss/92/ - MODELING AND SIMULATION OF MICRO ELECTRICAL DISCHARGE MACHINING PROCESS
+https://link.springer.com/article/10.1007/s12008-022-00939-5 - A comparative analysis on metamodel-based predictive modeling of electrical discharge machining processe (чисто формулы для расчета twr и mrr)
+https://link.springer.com/article/10.1007/s00170-014-5989-y - A hybrid process model for EDM based on finite-element method and Gaussian process regression (READ IT)
+https://link.springer.com/article/10.1007/s00170-015-7999-9 - Spark radius modeling of resistance-capacitance pulse discharge in micro-electric discharge machining of Ti-6Al-4V: an experimental study
+https://link.springer.com/article/10.1007/s12008-022-01003-y - Prediction performance analysis of neural network models for an electrical discharge turning process
+https://www.mdpi.com/2072-666X/12/6/667 - A Comparison between Finite Element Model (FEM) Simulation and an Integrated Artificial Neural Network (ANN)-Particle Swarm Optimization (PSO) Approach to Forecast Performances of Micro Electro Discharge Machining (Micro-EDM) Drilling (read)
+https://www.mdpi.com/2075-4701/14/1/14 - Progress in Simulation Modeling Based on the Finite Element Method for Electrical Discharge Machining (GOOOOOD or not( )
+
+Ну такое:
 https://cyberleninka.ru/article/n/model-protsessa-elektroerozionnoy-obrabotki - МОДЕЛЬ ПРОЦЕССА ЭЛЕКТРОЭРОЗИОННОЙ ОБРАБОТКИ (2008 год)
 https://cyberleninka.ru/article/n/issledovanie-protsessov-elektroerozionnoy-obrabotki - Исследование процессов электроэрозионной обработки
 https://elibrary.ru/item.asp?id=35613219 - ФИЗИЧЕСКАЯ МОДЕЛЬ ПРОЦЕССА ОБЪЁМНОЙ ЭЛЕКТРОЭРОЗИОННОЙ ОБРАБОТКИ ()
 https://www.elibrary.ru/item.asp?id=27259018 - ИССЛЕДОВАНИЕ ПРОЦЕССОВ ЭЛЕКТРОЭРОЗИОННОЙ ОБРАБОТКИ
-https://www.elibrary.ru/item.asp?id=47485900 - МОДЕЛИРОВАНИЕ ПРОЦЕССА ЭЛЕКТРОЭРОЗИОННОЙ ОБРАБОТКИ С ИСПОЛЬЗОВАНИЕМ НЕЙРОННЫХ СЕТЕЙ (в открытом доступе нет)
-https://www.elibrary.ru/item.asp?id=35657968 - МОДЕЛИРОВАНИЕ ФОРМИРОВАНИЯ ЭРОЗИОННЫХ ЛУНОК ПРИ ЭЛЕКТРОЭРОЗИОННОЙ МИКРООБРАБОТКЕ
-https://www.elibrary.ru/item.asp?id=47204657 - МОДЕЛИРОВАНИЕ ЕДИНИЧНОГО РАЗРЯДА ЭРОЗИОННОГО ПРОЦЕССА В КОМБИНИРОВАННОЙ ОБРАБОТКЕ ТВЕРДОГО СПЛАВА
-https://www.sciencedirect.com/science/article/pii/S2214157X24000029 - Thermal simulation of microelectrode machining process during block electrical discharge grinding
 https://www.sciencedirect.com/science/article/pii/S2212827119307875 - Numerical simulation and validation of material loadings during electrical discharge machining
 
+Ссылки в курсовой есть на:
+https://www.sciencedirect.com/science/article/pii/S2214157X24003344 - Thermal model of crater formation process in electrical discharge machining ***
+https://www.mdpi.com/2075-4701/14/1/14 - Progress in Simulation Modeling Based on the Finite Element Method for Electrical Discharge Machining ***
+https://www.sciencedirect.com/science/article/pii/S2666827021000499 - Machine learning and statistical approach in modeling and optimization of surface roughness in wire electrical discharge machining ***
+https://cyberleninka.ru/article/n/modelirovanie-elektroerozionnogo-proshivaniya-mikrootverstiy - Моделирование электроэрозионного прошивания микроотверстий (interesting) ***
 Савицкий В.В. Электроэрозионные методы обработки материалов: учебное пособие для вузов – Витебск: УО "ВГТУ", 2006. – 276 с. ***
 https://pythonnumericalmethods.studentorg.berkeley.edu/notebooks/Index.html - Python Programming and Numerical Methods: A Guide for Engineers and Scientists ***
