@@ -3,9 +3,9 @@ import numpy as np
 import math
 import os
 
-def compute_joint_positions_and_orientations(urdf_file, target_position):
-    my_chain = ikpy.chain.Chain.from_urdf_file(urdf_file)
-    inverse_kinematics = my_chain.inverse_kinematics(target_position)
+def compute_joint_positions_and_orientations(urdf_file, target_position, target_orientation_vector):
+    my_chain = ikpy.chain.Chain.from_urdf_file(urdf_file, active_links_mask=[False, True, True, True, True, True, True, True, False])
+    inverse_kinematics = my_chain.inverse_kinematics(target_position=target_position, target_orientation=target_orientation_vector, orientation_mode='Z')
     transformations = my_chain.forward_kinematics(inverse_kinematics, full_kinematics=True)
     
     joint_positions = []
@@ -54,8 +54,8 @@ def emulate_movement(direction, step, count, list):
         list.append(position)
     
 
-def generate_config(target_positions, imgs = False):
-    joint_positions, joint_orientations = compute_joint_positions_and_orientations(urdf_file, target_positions[len(target_positions) - 1])
+def generate_config(target_positions, target_orientation_vector, imgs = False):
+    joint_positions, joint_orientations = compute_joint_positions_and_orientations(urdf_file, target_positions[len(target_positions) - 1], target_orientation_vector)
     config = ""
     for i in range(len(joint_positions)):
         config += f"pos{i} = [{joint_positions[i][0]}, {joint_positions[i][1]}, {joint_positions[i][2]}];"
@@ -81,8 +81,9 @@ def generate_images():
 
 if __name__ == "__main__":
     urdf_file = "unnamed.urdf"
-    target_positions = [[0.5,0.15,0.2]] 
-    generate_config(target_positions, False)
+    target_orientation_vector = [0, 0, -1]
+    target_positions = [[100,-30,40]] 
+    generate_config(target_positions, target_orientation_vector, False)
     # lastImageNum = 1
     # urdf_file = "../3DModel/urdf/unnamed.urdf"
 
