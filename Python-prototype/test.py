@@ -74,7 +74,7 @@ def visualize_gcode_movements(movements):
 
 
 if __name__ == "__main__":
-    filename = "AA8_test.gcode"  # путь к вашему файлу
+    filename = "AA8_test1.gcode"  # путь к вашему файлу
     moves = parse_gcode_movements(filename)
     # print(moves) # Можно раскомментировать для отладки
     visualize_gcode_movements(moves)

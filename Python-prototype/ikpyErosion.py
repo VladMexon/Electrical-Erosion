@@ -3,6 +3,8 @@ import numpy as np
 import math
 import os
 
+lastImageNum = 0
+
 def compute_joint_positions_and_orientations(urdf_file, target_position, target_orientation_vector):
     my_chain = ikpy.chain.Chain.from_urdf_file(urdf_file, active_links_mask=[False, True, True, True, True, True, True, True, False])
     inverse_kinematics = my_chain.inverse_kinematics(target_position=target_position, target_orientation=target_orientation_vector, orientation_mode='Z')
@@ -20,8 +22,6 @@ def compute_joint_positions_and_orientations(urdf_file, target_position, target_
         
         joint_positions.append(position)
         joint_orientations.append(orientation_euler)
-        
-        #print(f"Joint {i}: Position = {position}, Orientation (Euler angles) = {orientation_euler}")
     
     return joint_positions, joint_orientations
 
@@ -42,19 +42,7 @@ def rotation_matrix_to_euler_angles(R):
     x, y, z = np.array([x, y, z]) * 180.0 / math.pi
     return np.array([x, y, z])
 
-def emulate_movement(direction, step, count, list):
-    for i in range(count):
-        position = list[len(list) - 1].copy()
-        if(direction == 'x'):
-            position[0] += step
-        elif(direction == 'y'):
-            position[1] += step
-        elif(direction == 'z'):
-            position[2] += step
-        list.append(position)
-    
-
-def generate_config(target_positions, target_orientation_vector, imgs = False):
+def generate_config(target_positions, target_orientation_vector, urdf_file, imgs = False):
     joint_positions, joint_orientations = compute_joint_positions_and_orientations(urdf_file, target_positions[len(target_positions) - 1], target_orientation_vector)
     config = ""
     for i in range(len(joint_positions)):
@@ -78,34 +66,20 @@ def generate_images():
     os.system(f"\"c:\Program Files\OpenSCAD\openscad.exe\" -o imgs/output{lastImageNum}.png openSCADModel2.scad");
     lastImageNum += 1
 
+def interface(start_position, target_positions, target_orientation, urdf, imgs = False):
+    positions = []
+    e = 0
+    for i in target_positions:
+        if i["E"] > e: #Проверка на выдавливание чтобы отсесять лишние движения
+            e = i["E"]
+            positions.append([i["X"] + start_position[0], i["Y"] + start_position[1], i["Z"] + start_position[2]])
+    generate_config(positions, target_orientation, urdf, imgs)
 
 if __name__ == "__main__":
     urdf_file = "unnamed.urdf"
     target_orientation_vector = [0, 0, -1]
-    target_positions = [[100,-30,40]] 
-    generate_config(target_positions, target_orientation_vector, False)
-    # lastImageNum = 1
-    # urdf_file = "../3DModel/urdf/unnamed.urdf"
-
-    # step = 0.02
-    # stepZ= 0.05
-    # target_positions = [[3.05,-0.4,3.2]] #start point
-    # for i in range(math.floor(0.1/step)):
-    #     generate_config(target_positions, True)
-    #     emulate_movement('z', -stepZ, 1, target_positions)
-    #     generate_config(target_positions, True)
-    #     emulate_movement('z', stepZ, 1, target_positions)
-    #     generate_config(target_positions, True)
-    #     emulate_movement('y', step, 1, target_positions)
-    # target_positions = [[3.05,-0.4,3.15]] #start point
-    # for i in range(3):
-    #     emulate_movement('y', step, math.floor(0.8/step) - i * 2, target_positions)
-    #     emulate_movement('x', step, math.floor(0.1/step) - i * 2, target_positions)
-    #     emulate_movement('y', -step, math.floor(0.8/step) - i * 2, target_positions)
-    #     emulate_movement('x', -step, math.floor(0.1/step) - i * 2, target_positions)
-    #     emulate_movement('x', step, 1, target_positions)
-    #     emulate_movement('y', step, 1, target_positions)
-    #     generate_config(target_positions, True)
+    target_positions = [[200,-150,200]] 
+    generate_config(target_positions, target_orientation_vector, "unnamed.urdf", False)
         
 
 
