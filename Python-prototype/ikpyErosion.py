@@ -42,7 +42,7 @@ def rotation_matrix_to_euler_angles(R):
     x, y, z = np.array([x, y, z]) * 180.0 / math.pi
     return np.array([x, y, z])
 
-def generate_config(target_positions, target_orientation_vector, urdf_file, imgs = False):
+def generate_config(target_positions, target_orientation_vector, radius, depth, urdf_file, imgs = False):
     joint_positions, joint_orientations = compute_joint_positions_and_orientations(urdf_file, target_positions[len(target_positions) - 1], target_orientation_vector)
     config = ""
     for i in range(len(joint_positions)):
@@ -55,6 +55,8 @@ def generate_config(target_positions, target_orientation_vector, urdf_file, imgs
         if i < len(target_positions) - 1:
             config += ","
     config += "];"
+    config += "radius = " + str(radius) + ";"
+    config += "depth = " + str(depth) + ";"
     f = open("config.scad", "w")
     f.write(config)
     f.close()
@@ -69,7 +71,7 @@ def generate_images():
 def add_offset(point, offset):
     return [point[0] + offset[0], point[1] + offset[1], point[2] + offset[2]]
 
-def interface(start_position, target_positions, target_orientation, urdf, imgs = False):
+def interface(start_position, target_positions, target_orientation, radius, depth, urdf, imgs = False):
     positions = []
     e = 0
     for i in range(len(target_positions)):
@@ -80,7 +82,7 @@ def interface(start_position, target_positions, target_orientation, urdf, imgs =
                 positions.append(add_offset(mid_point, start_position))
             current_point = [target_positions[i]["X"], target_positions[i]["Y"], target_positions[i]["Z"]]
             positions.append(add_offset(current_point, start_position))
-    generate_config(positions, target_orientation, urdf, imgs)
+    generate_config(positions, target_orientation, radius, depth, urdf, imgs)
 
 def in_between(dot1, dot2):
     return [(dot1["X"] + dot2["X"]) / 2, (dot1["Y"] + dot2["Y"]) / 2, (dot1["Z"] + dot2["Z"]) / 2]

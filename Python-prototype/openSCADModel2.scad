@@ -98,7 +98,7 @@ color("firebrick")
 scale(1000) translate([0.2,-0.15,0.1]) cube([0.3,0.3,0.2]);//table 200/-150/300
 difference(){
     color("gray")
-    translate([250,-70,300]) cube([100,50,1]);
+    translate([260,-65,300]) cube([100,50,1]);
     for(i = cuts)
-    translate(i) sphere(0.2, $fn=20);
+    translate(i) cylinder(depth, radius, radius, $fn=10);
 }
