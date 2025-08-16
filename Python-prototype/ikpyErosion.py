@@ -66,14 +66,24 @@ def generate_images():
     os.system(f"\"c:\Program Files\OpenSCAD\openscad.exe\" -o imgs/output{lastImageNum}.png openSCADModel2.scad");
     lastImageNum += 1
 
+def add_offset(point, offset):
+    return [point[0] + offset[0], point[1] + offset[1], point[2] + offset[2]]
+
 def interface(start_position, target_positions, target_orientation, urdf, imgs = False):
     positions = []
     e = 0
-    for i in target_positions:
-        if i["E"] > e: #Проверка на выдавливание чтобы отсесять лишние движения
-            e = i["E"]
-            positions.append([i["X"] + start_position[0], i["Y"] + start_position[1], i["Z"] + start_position[2]])
+    for i in range(len(target_positions)):
+        if target_positions[i]["E"] > e: #Проверка на выдавливание чтобы отсесять лишние движения
+            e = target_positions[i]["E"]
+            if i > 0:
+                mid_point = in_between(target_positions[i], target_positions[i-1])
+                positions.append(add_offset(mid_point, start_position))
+            current_point = [target_positions[i]["X"], target_positions[i]["Y"], target_positions[i]["Z"]]
+            positions.append(add_offset(current_point, start_position))
     generate_config(positions, target_orientation, urdf, imgs)
+
+def in_between(dot1, dot2):
+    return [(dot1["X"] + dot2["X"]) / 2, (dot1["Y"] + dot2["Y"]) / 2, (dot1["Z"] + dot2["Z"]) / 2]
 
 if __name__ == "__main__":
     urdf_file = "unnamed.urdf"

@@ -20,5 +20,5 @@ if __name__ == "__main__":
     target_positions = get_layer(movements, layer_number(movements))
 
     for i in range(len(target_positions) - 1):
-        print(target_positions[0:i + 1])
+        #print(target_positions[0:i + 1])
         interface(start_position, target_positions[0:i + 1], target_orientation, "./unnamed.urdf", False)
