@@ -65,7 +65,7 @@ def generate_config(target_positions, target_orientation_vector, radius, depth, 
 
 def generate_images():
     global lastImageNum
-    os.system(f"\"c:\Program Files\OpenSCAD\openscad.exe\" -o imgs/output{lastImageNum}.png openSCADModel2.scad");
+    os.system(f"\"c:\Program Files\OpenSCAD\openscad.exe\" -o imgs/output{lastImageNum}.png openSCADModel2.scad --imgsize=1920,1080")
     lastImageNum += 1
 
 def add_offset(point, offset):
@@ -73,15 +73,12 @@ def add_offset(point, offset):
 
 def interface(start_position, target_positions, target_orientation, radius, depth, urdf, imgs = False):
     positions = []
-    e = 0
     for i in range(len(target_positions)):
-        if target_positions[i]["E"] > e: #Проверка на выдавливание чтобы отсесять лишние движения
-            e = target_positions[i]["E"]
-            if i > 0:
-                mid_point = in_between(target_positions[i], target_positions[i-1])
-                positions.append(add_offset(mid_point, start_position))
-            current_point = [target_positions[i]["X"], target_positions[i]["Y"], target_positions[i]["Z"]]
-            positions.append(add_offset(current_point, start_position))
+        if i > 0:
+            mid_point = in_between(target_positions[i], target_positions[i-1])
+            positions.append(add_offset(mid_point, start_position))
+        current_point = [target_positions[i]["X"], target_positions[i]["Y"], target_positions[i]["Z"]]
+        positions.append(add_offset(current_point, start_position))
     generate_config(positions, target_orientation, radius, depth, urdf, imgs)
 
 def in_between(dot1, dot2):

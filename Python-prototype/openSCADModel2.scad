@@ -62,7 +62,7 @@ module myrotate(a, orig) {
   rotate(a)
   children();
 }
-translate([250,-5,300])import("test1.stl");
+translate([200,-150,290])rotate([90,0,0]) import("test1.stl");
 myrotate(rot1, pos1) {
   joint1();
 }
@@ -98,7 +98,7 @@ color("firebrick")
 scale(1000) translate([0.2,-0.15,0.1]) cube([0.3,0.3,0.2]);//table 200/-150/300
 difference(){
     color("gray")
-    translate([260,-65,300]) cube([100,50,1]);
+    translate([210,-140,300]) cube([280,280,1]);
     for(i = cuts)
     translate(i) cylinder(depth, radius, radius, $fn=10);
 }

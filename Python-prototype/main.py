@@ -12,6 +12,15 @@ def layer_number(movements):
 def get_layer(movements, layer):
     return list(filter(lambda a : a['layer'] == layer, movements))
 
+def filter_movements(target_positions):
+    positions = []
+    e = 0
+    for i in range(len(target_positions)):
+        if target_positions[i]["E"] > e: #Проверка на выдавливание чтобы отсесять лишние движения
+            e = target_positions[i]["E"]
+            positions.append(target_positions[i])
+    return positions
+
 if __name__ == "__main__":
     C45_props = {
         "rho": 7875,    # кг/м^3 (Плотность)
@@ -31,7 +40,7 @@ if __name__ == "__main__":
     alpha_factor = 0.1 # Доля материала, удаляемого испарением
     
     # Диаметр электрода
-    electrode_diameter = 0.003 # м (5 мм)
+    electrode_diameter = 0.003 # м (3 мм)
     
     # Количество разрядов
     discharges = 50000
@@ -53,8 +62,7 @@ if __name__ == "__main__":
     start_position = [200, -150, 300]
 
     movements = parse_gcode_movements("AA8_test1.gcode")
-    target_positions = get_layer(movements, layer_number(movements))
+    target_positions = filter_movements(get_layer(movements, layer_number(movements)))
 
     for i in range(len(target_positions) - 1):
-        #print(target_positions[0:i + 1])
-        interface(start_position, target_positions[0:i + 1], target_orientation, radius, depth, "./unnamed.urdf", False)
+        interface(start_position, target_positions[0:i + 1], target_orientation, radius, depth, "./unnamed.urdf", True)
