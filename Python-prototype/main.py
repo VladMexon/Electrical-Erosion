@@ -1,68 +1,186 @@
+import time
+import math
+import numpy as np
 from gcode_parser import parse_gcode_movements
-from ikpyErosion import interface
-from model import calculate_crater_dimensions
+from ikpyErosion import generate_config
+from model import calculate_time_for_depth, get_crater_radius
 
-def layer_number(movements):
-    layers = 0
-    for i in movements:
-        if i["layer"] > layers:
-            layers = i["layer"]
-    return layers
+def get_layer_movements(movements, layer_index):
+    """Возвращает движения для указанного слоя."""
+    return list(filter(lambda a: a['layer'] == layer_index, movements))
 
-def get_layer(movements, layer):
-    return list(filter(lambda a : a['layer'] == layer, movements))
-
-def filter_movements(target_positions):
+def filter_extrusion_movements(target_positions):
+    """Отфильтровывает движения без экструзии."""
     positions = []
-    e = 0
-    for i in range(len(target_positions)):
-        if target_positions[i]["E"] > e: #Проверка на выдавливание чтобы отсесять лишние движения
-            e = target_positions[i]["E"]
-            positions.append(target_positions[i])
+    last_e = 0
+    for move in target_positions:
+        if move["E"] > last_e:
+            last_e = move["E"]
+            positions.append(move)
     return positions
 
+def get_layer_height(movements, layer_index):
+    """Рассчитывает высоту (толщину) слоя в метрах."""
+    if layer_index == 0:
+        # Для первого слоя высота - это первая Z координата
+        first_move_z = next((m['Z'] for m in movements if m['layer'] == 0 and 'Z' in m), 0)
+        return first_move_z / 1000 # в метры
+    
+    current_layer_moves = get_layer_movements(movements, layer_index)
+    prev_layer_moves = get_layer_movements(movements, layer_index - 1)
+    
+    if not current_layer_moves or not prev_layer_moves:
+        return 0.0 # Невозможно рассчитать
+
+    # Средняя Z для текущего и предыдущего слоев
+    avg_z_current = np.mean([m['Z'] for m in current_layer_moves if 'Z' in m])
+    avg_z_prev = np.mean([m['Z'] for m in prev_layer_moves if 'Z' in m])
+    
+    height = abs(avg_z_current - avg_z_prev) / 1000 # в метры
+    return height if height > 0 else 0.2 / 1000 # Запасной вариант, если высота слоя 0
+
 if __name__ == "__main__":
+    # --- Параметры материала и обработки ---
     C45_props = {
-        "rho": 7875,    # кг/м^3 (Плотность)
-        "r_v": 6339000, # Дж/кг (Теплота испарения)
-        "L_m": 278000,  # Дж/кг (Теплота плавления)
-        "C": 452,       # Дж/(кг·°C) (Удельная теплоемкость)
-        "T_m": 1535,    # °C (Температура плавления)
-        "T_b": 3050,    # °C (Температура кипения)
-        "T_0": 20,      # °C (Начальная температура)
+        "rho": 7875, "r_v": 6339000, "L_m": 278000, "C": 452,
+        "T_m": 1535, "T_b": 3050, "T_0": 20,
     }
-
-    # Параметры электроэрозионной обработки (EDM)
-    U_pulse = 160.0  # В (Напряжение импульса)
-    I_pulse = 8.0    # А (Ток импульса)
-    t_pulse = 100e-6 # с (Длительность импульса, 100 мкс) 
-    C_a = 0.01       # Коэффициент использования энергии
-    alpha_factor = 0.1 # Доля материала, удаляемого испарением
-    
-    # Диаметр электрода
+    U_pulse = 160.0
+    I_pulse = 8.0
+    t_pulse = 100e-6
+    C_a = 0.01
+    alpha_factor = 0.1
     electrode_diameter = 0.003 # м (3 мм)
-    
-    # Количество разрядов
-    discharges = 50000
 
-    # 2. Вызов функции
-    radius, depth = calculate_crater_dimensions(
-        material_props=C45_props,
-        U_pulse=U_pulse,
-        I_pulse=I_pulse,
-        t_pulse=t_pulse,
-        C_a=C_a,
-        alpha_factor=alpha_factor,
-        electrode_diameter_m=electrode_diameter,
-        num_discharges=discharges
-    )
-
+    # --- Настройки симуляции ---
+    dt = 0.1  # с (временной шаг симуляции)
     urdf_file = "unnamed.urdf"
     target_orientation = [0, 0, -1]
-    start_position = [200, -150, 300]
+    # Смещение системы координат G-кода относительно мировой системы координат робота
+    gcode_offset = np.array([200.0, -150.0, 300.0])
+    start_position = gcode_offset  # Начинаем в точке отсчета G-кода
 
-    movements = parse_gcode_movements("AA8_test1.gcode")
-    target_positions = filter_movements(get_layer(movements, layer_number(movements)))
+    # --- Загрузка и обработка G-кода ---
+    gcode_file = "AA8_test1.gcode"
+    all_movements = parse_gcode_movements(gcode_file)
+    
+    # Определяем последний слой для обработки
+    last_layer_index = max(m['layer'] for m in all_movements)
+    target_movements = filter_extrusion_movements(get_layer_movements(all_movements, last_layer_index))
+    
+    if not target_movements:
+        print("Нет движений для обработки.")
+        exit()
 
-    for i in range(len(target_positions) - 1):
-        interface(start_position, target_positions[0:i + 1], target_orientation, radius, depth, "./unnamed.urdf", True)
+    # --- Инициализация симуляции ---
+    layer_depth_m = get_layer_height(all_movements, last_layer_index)
+    print(f"Глубина слоя: {layer_depth_m * 1000:.4f} мм")
+
+    drilling_time_per_hole = calculate_time_for_depth(
+        C45_props, U_pulse, I_pulse, t_pulse, C_a, alpha_factor, 
+        electrode_diameter, layer_depth_m
+    )
+    print(f"Расчетное время обработки одной лунки: {drilling_time_per_hole:.4f} с")
+
+    crater_radius_mm = get_crater_radius(electrode_diameter)
+    crater_diameter_mm = crater_radius_mm * 2
+
+    # --- Генерация плотной очереди точек для сверления ---
+    primary_points = [np.array([m['X'], m['Y'], m['Z']]) for m in target_movements]
+    point_queue_local = [] # Координаты без смещения
+
+    if primary_points:
+        # Добавляем первую точку G-кода
+        point_queue_local.append(primary_points[0])
+
+        # Проходим по сегментам пути
+        for i in range(len(primary_points) - 1):
+            p1 = primary_points[i]
+            p2 = primary_points[i+1]
+            
+            segment_vector = p2 - p1
+            segment_length = np.linalg.norm(segment_vector)
+            
+            # Если сегмент длиннее диаметра лунки, заполняем его
+            if segment_length > crater_diameter_mm:
+                direction_vector = segment_vector / segment_length
+                
+                # Рассчитываем, сколько целых лунок поместится
+                num_holes = math.floor(segment_length / crater_diameter_mm)
+                
+                # Генерируем промежуточные точки
+                for j in range(1, num_holes):
+                    new_point = p1 + direction_vector * j * crater_diameter_mm
+                    point_queue_local.append(new_point)
+            
+            # Всегда добавляем конечную точку сегмента из G-кода
+            point_queue_local.append(p2)
+
+    # Удаляем дубликаты, которые могли возникнуть, сохраняя порядок
+    seen = set()
+    point_queue_unique_local = []
+    for p in point_queue_local:
+        p_tuple = tuple(p)
+        if p_tuple not in seen:
+            seen.add(p_tuple)
+            point_queue_unique_local.append(p)
+
+    # Применяем глобальное смещение ко всем точкам
+    point_queue = [p + gcode_offset for p in point_queue_unique_local]
+    print(f"Сгенерировано {len(point_queue)} точек для обработки.")
+
+    if not point_queue:
+        print("Очередь точек пуста, симуляция не будет запущена.")
+        exit()
+
+    completed_holes = []
+    current_pos = start_position
+    current_point_index = 0
+    state = "MOVING" # Состояния: MOVING, DRILLING, IDLE
+    drilling_timer = 0
+
+    # --- Основной цикл симуляции ---
+    while state != "IDLE":
+        # Целевая точка для текущего движения или сверления
+        target_pos = point_queue[current_point_index]
+        
+        if state == "MOVING":
+            move_vector = target_pos - current_pos
+            distance = np.linalg.norm(move_vector)
+            
+            # Скорость из g-кода (мм/мин) -> мм/с
+            feed_rate = target_movements[current_point_index].get('F', 3000) / 60
+            
+            if distance > 0:
+                move_step = move_vector / distance * feed_rate * dt
+                if np.linalg.norm(move_step) >= distance:
+                    current_pos = target_pos
+                    state = "DRILLING"
+                    drilling_timer = drilling_time_per_hole
+                else:
+                    current_pos += move_step
+            else: # Если уже в точке
+                state = "DRILLING"
+                drilling_timer = drilling_time_per_hole
+
+        elif state == "DRILLING":
+            drilling_timer -= dt
+            if drilling_timer <= 0:
+                # Добавляем завершенную лунку в список для отрисовки
+                completed_holes.append(target_pos.tolist())
+                
+                current_point_index += 1
+                if current_point_index >= len(point_queue):
+                    state = "IDLE"
+                else:
+                    state = "MOVING"
+        
+        # --- Отрисовка кадра ---
+        # Для IK используется текущее положение, для `cuts` - все завершенные лунки
+        render_positions = completed_holes + [current_pos.tolist()]
+        generate_config(render_positions, target_orientation, crater_radius_mm, layer_depth_m * 1000, urdf_file, True)
+        
+        # Задержка для соответствия реальному времени (опционально)
+        # time.sleep(dt)
+
+    print("Симуляция завершена.")
