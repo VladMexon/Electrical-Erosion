@@ -1,6 +1,6 @@
-import time
 import math
 import numpy as np
+import os
 from gcode_parser import parse_gcode_movements
 from ikpyErosion import generate_config
 from model import calculate_time_for_depth, get_crater_radius
@@ -40,6 +40,7 @@ def get_layer_height(movements, layer_index):
     return height if height > 0 else 0.2 / 1000 # Запасной вариант, если высота слоя 0
 
 if __name__ == "__main__":
+    os_id = os.name
     # --- Параметры материала и обработки ---
     C45_props = {
         "rho": 7875, "r_v": 6339000, "L_m": 278000, "C": 452,
@@ -50,10 +51,10 @@ if __name__ == "__main__":
     t_pulse = 100e-6
     C_a = 0.01
     alpha_factor = 0.1
-    electrode_diameter = 0.003 # м (3 мм)
+    electrode_diameter = 0.002 # м (2 мм)
 
     # --- Настройки симуляции ---
-    dt = 0.1  # с (временной шаг симуляции)
+    dt = 1  # с (временной шаг симуляции)
     urdf_file = "unnamed.urdf"
     target_orientation = [0, 0, -1]
     # Смещение системы координат G-кода относительно мировой системы координат робота
@@ -86,47 +87,45 @@ if __name__ == "__main__":
     crater_diameter_mm = crater_radius_mm * 2
 
     # --- Генерация плотной очереди точек для сверления ---
-    primary_points = [np.array([m['X'], m['Y'], m['Z']]) for m in target_movements]
-    point_queue_local = [] # Координаты без смещения
+    point_queue_local = [] # Теперь будет список словарей
 
-    if primary_points:
+    if target_movements:
         # Добавляем первую точку G-кода
-        point_queue_local.append(primary_points[0])
+        first_move = target_movements[0]
+        point_queue_local.append({
+            'pos': np.array([first_move['X'], first_move['Y'], first_move['Z']]),
+            'feed_rate': first_move.get('F', 3000) / 60
+        })
 
         # Проходим по сегментам пути
-        for i in range(len(primary_points) - 1):
-            p1 = primary_points[i]
-            p2 = primary_points[i+1]
+        for i in range(len(target_movements) - 1):
+            m1 = target_movements[i]
+            m2 = target_movements[i+1]
+            
+            p1 = np.array([m1['X'], m1['Y'], m1['Z']])
+            p2 = np.array([m2['X'], m2['Y'], m2['Z']])
             
             segment_vector = p2 - p1
             segment_length = np.linalg.norm(segment_vector)
             
+            # Скорость для этого сегмента
+            segment_feed_rate = m2.get('F', 3000) / 60
+
             # Если сегмент длиннее диаметра лунки, заполняем его
             if segment_length > crater_diameter_mm:
                 direction_vector = segment_vector / segment_length
                 
-                # Рассчитываем, сколько целых лунок поместится
                 num_holes = math.floor(segment_length / crater_diameter_mm)
                 
-                # Генерируем промежуточные точки
                 for j in range(1, num_holes):
-                    new_point = p1 + direction_vector * j * crater_diameter_mm
-                    point_queue_local.append(new_point)
+                    new_point_pos = p1 + direction_vector * j * crater_diameter_mm
+                    point_queue_local.append({'pos': new_point_pos, 'feed_rate': segment_feed_rate})
             
             # Всегда добавляем конечную точку сегмента из G-кода
-            point_queue_local.append(p2)
-
-    # Удаляем дубликаты, которые могли возникнуть, сохраняя порядок
-    seen = set()
-    point_queue_unique_local = []
-    for p in point_queue_local:
-        p_tuple = tuple(p)
-        if p_tuple not in seen:
-            seen.add(p_tuple)
-            point_queue_unique_local.append(p)
+            point_queue_local.append({'pos': p2, 'feed_rate': segment_feed_rate})
 
     # Применяем глобальное смещение ко всем точкам
-    point_queue = [p + gcode_offset for p in point_queue_unique_local]
+    point_queue = [{'pos': p['pos'] + gcode_offset, 'feed_rate': p['feed_rate']} for p in point_queue_local]
     print(f"Сгенерировано {len(point_queue)} точек для обработки.")
 
     if not point_queue:
@@ -142,14 +141,15 @@ if __name__ == "__main__":
     # --- Основной цикл симуляции ---
     while state != "IDLE":
         # Целевая точка для текущего движения или сверления
-        target_pos = point_queue[current_point_index]
+        target_item = point_queue[current_point_index]
+        target_pos = target_item['pos']
         
         if state == "MOVING":
             move_vector = target_pos - current_pos
             distance = np.linalg.norm(move_vector)
             
             # Скорость из g-кода (мм/мин) -> мм/с
-            feed_rate = target_movements[current_point_index].get('F', 3000) / 60
+            feed_rate = target_item['feed_rate']
             
             if distance > 0:
                 move_step = move_vector / distance * feed_rate * dt
@@ -178,9 +178,7 @@ if __name__ == "__main__":
         # --- Отрисовка кадра ---
         # Для IK используется текущее положение, для `cuts` - все завершенные лунки
         render_positions = completed_holes + [current_pos.tolist()]
-        generate_config(render_positions, target_orientation, crater_radius_mm, layer_depth_m * 1000, urdf_file, True)
+        generate_config(render_positions, target_orientation, crater_radius_mm, layer_depth_m * 1000, urdf_file,  os_id,True)
         
-        # Задержка для соответствия реальному времени (опционально)
-        # time.sleep(dt)
 
     print("Симуляция завершена.")
